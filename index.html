@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conspect — Designul jocurilor în Republica Moldova</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="%2316130e"/><rect x="2" y="2" width="4" height="4" fill="%23c6f24e"/></svg>'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#16130e; --bg2:#1d1912; --panel:#211c14;
+  --ink:#ede4cf; --soft:#cfc5ad; --mut:#a0957c;
+  --line:#39301f; --line2:#4a3f28; --shadow:#0b0906;
+  --acid:#c6f24e; --amber:#ffb640; --coral:#ff7a5c; --rose:#ff5f7e;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Space Grotesk',sans-serif; font-size:16.5px; line-height:1.68;
+  cursor:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect x="1" y="1" width="10" height="10" fill="%23c6f24e" stroke="%2316130e" stroke-width="2"/></svg>') 6 6, auto;
+}
+::selection{background:var(--acid);color:#16130e}
+::-webkit-scrollbar{width:10px;background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--line2);border:2px solid var(--bg2)}
+:focus-visible{outline:2px solid var(--acid);outline-offset:2px}
+.px{font-family:'Press Start 2P',monospace}
+.vt{font-family:'VT323',monospace}
+.hidden{display:none!important}
+mark{background:var(--amber);color:#241b07;padding:0 4px;font-weight:700}
+.ic{width:14px;height:14px;flex:0 0 auto;shape-rendering:crispEdges;color:currentColor}
+.led{width:9px;height:9px;background:var(--acid);display:inline-block;flex:0 0 9px}
+.led.blink{animation:blink 1.2s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.15}}
+
+/* ---------- butoane pixel ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+  color:#141109;background:var(--acid);border:2px solid #141109;
+  padding:13px 18px;box-shadow:5px 5px 0 var(--shadow);cursor:pointer;text-decoration:none;
+  transition:transform .07s ease, box-shadow .07s ease;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--shadow)}
+.btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--shadow)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line2);box-shadow:5px 5px 0 rgba(0,0,0,.45)}
+.btn .ic{width:12px;height:12px;color:inherit}
+
+/* ---------- panouri ---------- */
+.panel{position:relative;background:var(--bg2);border:2px solid var(--line2);box-shadow:7px 7px 0 rgba(0,0,0,.4)}
+.panel::before,.panel::after{content:"";position:absolute;width:8px;height:8px;background:var(--acid)}
+.panel::before{top:-2px;left:-2px}
+.panel::after{bottom:-2px;right:-2px}
+
+/* ---------- HUD lateral (desktop) ---------- */
+#side{
+  position:fixed;inset:0 auto 0 0;width:272px;z-index:50;
+  background:var(--bg2);border-right:2px solid var(--line);
+  display:flex;flex-direction:column;gap:18px;padding:22px 20px;overflow-y:auto;
+}
+.logo{display:flex;flex-direction:column;gap:8px}
+.logo b{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--acid);display:flex;align-items:center;gap:10px}
+.logo b i{width:12px;height:12px;background:var(--acid);box-shadow:3px 3px 0 var(--shadow)}
+.logo small{color:var(--mut);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.pcard{padding:16px}
+.pc-name{font-size:11px;letter-spacing:.08em}
+.pc-class{color:var(--mut);font-size:12.5px;margin-top:5px}
+.pc-lvl{display:flex;align-items:baseline;gap:10px;margin-top:10px}
+.pc-lvl .vt{font-size:46px;line-height:.85;color:var(--acid)}
+.pc-lab{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mut)}
+.xpblock{display:flex;flex-direction:column;gap:9px}
+.xp-top{display:flex;justify-content:space-between;align-items:center}
+.xp-top .px{font-size:9px;color:var(--mut);letter-spacing:.1em}
+.xp-top .vt{font-size:20px;color:var(--amber)}
+#segs{display:grid;grid-template-columns:repeat(14,1fr);gap:3px}
+#segs i{height:12px;background:var(--line);border:1px solid var(--line2)}
+#segs i.on{background:var(--acid);border-color:var(--acid)}
+#xpTxt{font-size:19px;color:var(--mut)}
+.map-t{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--mut);letter-spacing:.18em;margin-bottom:6px}
+#mapNav{display:flex;flex-direction:column}
+#mapNav button{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  background:none;border:0;border-left:3px solid transparent;
+  color:var(--mut);font-family:'VT323',monospace;font-size:20px;letter-spacing:.04em;
+  padding:7px 10px;cursor:pointer;
+}
+#mapNav button:hover{color:var(--ink)}
+#mapNav button.cur{color:var(--acid);border-left-color:var(--acid);background:rgba(198,242,78,.06)}
+#mapNav button .ic{width:12px;height:12px;color:var(--acid);margin-left:auto;visibility:hidden}
+#mapNav button.clear{color:var(--ink)}
+#mapNav button.clear .ic{visibility:visible}
+.hud-btns{display:flex;gap:8px;margin-top:auto}
+.tb-btn,.hud-btns button{
+  flex:1;font-family:'Press Start 2P',monospace;font-size:7.5px;letter-spacing:.06em;
+  color:var(--ink);background:var(--bg);border:2px solid var(--line2);
+  padding:10px 6px;cursor:pointer;
+}
+.hud-btns button:hover,.tb-btn:hover{border-color:var(--acid);color:var(--acid)}
+.hud-note{font-size:11.5px;color:var(--mut);line-height:1.5}
+
+/* ---------- topbar (mobil) ---------- */
+#topbar{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:60;
+  background:var(--bg2);border-bottom:2px solid var(--line);
+  padding:10px 14px;align-items:center;gap:12px;
+}
+.tb-logo{font-size:10px;color:var(--acid)}
+.tb-logo .hl{color:var(--ink)}
+.mini{flex:1;height:10px;border:2px solid var(--line2);background:var(--bg)}
+.mini i{display:block;height:100%;width:0;background:var(--acid);transition:width .3s}
+
+/* ---------- conținut ---------- */
+main{margin-left:272px;padding:0 56px 70px;max-width:1180px}
+.hero{min-height:100vh;display:flex;align-items:center;padding:60px 0 30px}
+.hgrid{display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center;width:100%}
+.kick{display:flex;align-items:center;gap:10px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mut);letter-spacing:.14em;margin-bottom:22px}
+h1{font-family:'Press Start 2P',monospace;font-size:clamp(20px,2.6vw,34px);line-height:1.65;max-width:22ch}
+h1 .hl{color:var(--acid)}
+.lede{margin:22px 0 26px;color:var(--soft);max-width:56ch}
+.dialog{position:relative;background:var(--bg2);border:2px solid var(--line2);box-shadow:7px 7px 0 rgba(0,0,0,.4);padding:18px 20px 18px 26px;max-width:60ch}
+.dialog::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--acid)}
+.dialog .who{display:block;font-family:'Press Start 2P',monospace;font-size:8.5px;color:var(--acid);letter-spacing:.14em;margin-bottom:10px}
+.hbtns{display:flex;align-items:center;gap:18px;margin-top:28px;flex-wrap:wrap}
+.hint{font-family:'VT323',monospace;font-size:18px;color:var(--mut)}
+.skywrap{border:2px solid var(--line2);background:#12100b;box-shadow:8px 8px 0 rgba(0,0,0,.4)}
+.skywrap canvas{display:block;width:100%;height:auto;image-rendering:pixelated;aspect-ratio:2/1}
+.skybar{display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--line);padding:8px 12px;font-family:'VT323',monospace;font-size:18px;color:var(--mut)}
+.skybar span:first-child{display:flex;align-items:center;gap:9px}
+
+/* ---------- nivele ---------- */
+.level{padding:76px 0 26px;border-top:2px dashed var(--line)}
+.lhead{display:flex;gap:28px;align-items:flex-start;margin-bottom:36px}
+.lnum{font-family:'VT323',monospace;font-size:clamp(84px,9vw,130px);line-height:.78;color:transparent;-webkit-text-stroke:2px var(--line2);user-select:none;flex:0 0 auto}
+.l-kick{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--coral);letter-spacing:.16em;margin-bottom:14px}
+.level h2{font-family:'Press Start 2P',monospace;font-size:clamp(14px,1.8vw,21px);line-height:1.7;max-width:34ch}
+.keys{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.keys span{font-family:'VT323',monospace;font-size:17px;color:var(--mut);border:1px solid var(--line2);padding:1px 10px 2px}
+.lede2{color:var(--soft);max-width:70ch;margin-bottom:26px}
+
+/* ---------- notițe ---------- */
+.note{display:flex;gap:18px;padding:18px 0;border-bottom:1px dashed var(--line)}
+.n-idx{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:60px}
+.idx{font-family:'VT323',monospace;font-size:19px;color:var(--mut)}
+.nbox{width:16px;height:16px;border:2px solid var(--line2);display:grid;place-items:center}
+.nbox .ic{width:10px;height:10px;color:#141109;opacity:0}
+.note.got .nbox{background:var(--acid);border-color:var(--acid)}
+.note.got .nbox .ic{opacity:1}
+.note.got .idx{color:var(--acid)}
+.note h3{font-size:17.5px;margin-bottom:6px}
+.note p{color:var(--soft);max-width:68ch}
+
+/* ---------- statistici ---------- */
+.stats{display:flex;flex-wrap:wrap;border:2px solid var(--line2);background:var(--bg2);box-shadow:7px 7px 0 rgba(0,0,0,.35);margin:34px 0 10px}
+.stat{flex:1 1 190px;padding:22px;border-right:2px solid var(--line);position:relative}
+.stat:last-child{border-right:0}
+.s-num{font-family:'VT323',monospace;font-size:54px;line-height:1;color:var(--acid)}
+.s-num i{font-style:normal;font-size:34px;color:var(--amber)}
+.s-lab{font-size:13.5px;color:var(--soft);margin-top:8px;line-height:1.45}
+.s-tag{position:absolute;top:12px;right:12px;font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:.1em;padding:4px 6px;border:1px solid var(--line2);color:var(--mut)}
+.s-tag.fact{color:#141109;background:var(--acid);border-color:var(--acid)}
+.fnote{font-size:13.5px;color:var(--mut);max-width:70ch}
+.fnote b{color:var(--amber)}
+
+/* ---------- skill tree ---------- */
+.tree{display:flex;align-items:stretch;margin:30px 0 16px;overflow-x:auto;padding:4px 2px 10px}
+.node{
+  flex:0 0 auto;min-width:122px;text-align:left;
+  background:var(--bg2);border:2px solid var(--line2);box-shadow:4px 4px 0 rgba(0,0,0,.35);
+  padding:14px 12px 12px;display:flex;flex-direction:column;gap:9px;
+  cursor:pointer;font:inherit;color:inherit;transition:transform .07s;
+}
+.node:hover{transform:translate(-1px,-1px)}
+.node.sel{border-color:var(--acid)}
+.node b{font-family:'Press Start 2P',monospace;font-size:8.5px;line-height:1.55;letter-spacing:.05em}
+.node i{font-style:normal;font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em}
+.node .led{width:10px;height:10px;flex:0 0 10px;border:2px solid transparent}
+.st-strong .led{background:var(--acid)}
+.st-mid .led,.st-up .led{background:var(--amber)}
+.st-gap .led{background:transparent;border-color:var(--rose)}
+.st-strong i{color:var(--acid)}
+.st-mid i,.st-up i{color:var(--amber)}
+.st-gap i{color:var(--rose)}
+.lk{flex:0 0 26px;align-self:center;height:2px;background:var(--line2);position:relative}
+.lk::after{content:"";position:absolute;right:0;top:-4px;border:5px solid transparent;border-left-color:var(--line2)}
+.sdetail{border:2px solid var(--line2);background:var(--bg2);box-shadow:6px 6px 0 rgba(0,0,0,.35);padding:18px 20px;min-height:120px}
+.sdetail h4{font-family:'Press Start 2P',monospace;font-size:11px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.skst{font-family:'VT323',monospace;font-size:18px;letter-spacing:.1em}
+.skst.st-strong{color:var(--acid)} .skst.st-mid,.skst.st-up{color:var(--amber)} .skst.st-gap{color:var(--rose)}
+.sdetail p{color:var(--soft);max-width:72ch}
+
+/* ---------- tab-uri buff/debuff ---------- */
+.tabs{display:flex;gap:10px;margin:28px 0 14px;flex-wrap:wrap}
+.tab{
+  display:flex;align-items:center;gap:9px;cursor:pointer;
+  font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:.06em;
+  color:var(--ink);background:var(--bg2);border:2px solid var(--line2);
+  padding:11px 14px;box-shadow:4px 4px 0 rgba(0,0,0,.3);
+}
+.tab .ic{width:12px;height:12px}
+.tab.on[data-tab="buffs"]{background:var(--coral);color:#1c0f08;border-color:#1c0f08}
+.tab.on[data-tab="debuffs"]{background:var(--rose);color:#240a11;border-color:#240a11}
+.q{display:flex;gap:16px;padding:16px 4px;border-bottom:1px dashed var(--line);align-items:flex-start}
+.q .ic{width:16px;height:16px;margin-top:5px}
+#tab-buffs .ic{color:var(--coral)}
+#tab-debuffs .ic{color:var(--rose)}
+.q h4{font-size:16px;margin-bottom:4px}
+.q p{color:var(--soft);font-size:15px;max-width:62ch}
+.qtag{margin-left:auto;font-family:'VT323',monospace;font-size:18px;white-space:nowrap;color:var(--mut);padding-left:14px}
+#tab-buffs .qtag{color:var(--coral)}
+#tab-debuffs .qtag{color:var(--rose)}
+
+/* ---------- quests ---------- */
+.qcols{display:grid;grid-template-columns:1.25fr .9fr;gap:38px;margin-bottom:8px}
+.qcol h3{font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:.08em;padding-bottom:12px;border-bottom:2px solid var(--line2);margin-bottom:4px}
+.qcol.sq h3{color:var(--coral)}
+.qcol.mq h3{color:var(--amber)}
+.qcol ol{list-style:none;counter-reset:qq;display:flex;flex-direction:column}
+.qcol li{counter-increment:qq;display:flex;gap:14px;padding:14px 0;border-bottom:1px dashed var(--line)}
+.qcol li::before{content:counter(qq,decimal-leading-zero);font-family:'VT323',monospace;font-size:20px;color:var(--coral);min-width:30px;flex:0 0 30px}
+.qcol.mq li::before{color:var(--amber)}
+.qcol h4{font-size:16px;margin-bottom:4px}
+.qcol p{color:var(--soft);font-size:14.5px}
+
+/* ---------- quiz ---------- */
+.qpanel{padding:24px}
+.qprog{font-family:'VT323',monospace;font-size:20px;color:var(--mut);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.qtext{font-size:19px;margin:16px 0 18px;max-width:60ch}
+.ans{display:flex;flex-direction:column;gap:10px}
+.ans button{
+  display:flex;align-items:center;gap:14px;text-align:left;
+  font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line2);
+  padding:12px 16px;cursor:pointer;
+}
+.ans button::before{content:"";width:10px;height:10px;background:var(--line2);flex:0 0 10px}
+.ans button:hover:not(:disabled){border-color:var(--acid)}
+.ans button.good{border-color:var(--acid);background:rgba(198,242,78,.08)}
+.ans button.good::before{background:var(--acid)}
+.ans button.bad{border-color:var(--rose);background:rgba(255,95,126,.07)}
+.ans button.bad::before{background:var(--rose)}
+.ans button:disabled{opacity:.55;cursor:default}
+.why{display:none;margin-top:16px;border-left:4px solid var(--amber);background:var(--bg);padding:12px 16px;color:#d8cdb4;max-width:66ch}
+.why.show{display:block}
+.qnext{margin-top:16px}
+.rankline{display:flex;align-items:center;gap:28px;margin:14px 0 20px;flex-wrap:wrap}
+.rank{font-family:'VT323',monospace;font-size:120px;line-height:.85;color:var(--acid)}
+.qmsg{color:var(--soft);max-width:40ch;margin-top:6px}
+.certform{border-top:2px dashed var(--line);padding-top:20px;margin-top:8px}
+.cf-t{font-size:10px;color:var(--amber);letter-spacing:.1em;margin-bottom:14px}
+.cf-row{display:flex;gap:12px;flex-wrap:wrap}
+#nameInput{
+  background:var(--bg);border:2px solid var(--line2);color:var(--ink);
+  font-family:'VT323',monospace;font-size:22px;padding:9px 14px;width:min(340px,100%);
+  text-transform:uppercase;
+}
+#nameInput::placeholder{color:var(--mut)}
+#certWrap{margin-top:22px;border:2px solid var(--line2);max-width:640px}
+#certWrap canvas{width:100%;display:block}
+#dlCert{margin-top:14px}
+#againBtn{margin-top:22px}
+.qintro p{color:var(--soft);max-width:60ch;margin-bottom:18px}
+
+/* ---------- footer / toast / crt ---------- */
+footer{
+  margin-left:272px;border-top:2px solid var(--line);
+  padding:32px 56px 50px;color:var(--mut);font-size:13.5px;
+  display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;
+}
+footer b{color:var(--acid)}
+#toast{
+  position:fixed;top:18px;right:18px;z-index:100;
+  display:flex;align-items:center;gap:13px;padding:13px 17px;
+  background:var(--bg2);border:2px solid var(--acid);box-shadow:6px 6px 0 rgba(0,0,0,.45);
+  transform:translateY(-160%);transition:transform .28s cubic-bezier(.2,.9,.3,1.2);
+}
+#toast.show{transform:none}
+#toast .ic{width:16px;height:16px;color:var(--acid)}
+#toast b{display:block;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--acid);margin-bottom:4px}
+#toast span{font-family:'VT323',monospace;font-size:17px;color:var(--ink)}
+#crt{position:fixed;inset:0;z-index:95;pointer-events:none;display:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px)}
+#crt.on{display:block}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- mobil ---------- */
+@media(max-width:1023px){
+  #side{display:none}
+  #topbar{display:flex}
+  main{margin-left:0;padding:86px 18px 60px}
+  footer{margin-left:0;padding:32px 18px 50px}
+  .hero{min-height:auto;padding:26px 0 10px}
+  .hgrid{grid-template-columns:1fr;gap:34px}
+  .lnum{font-size:64px}
+  .lhead{gap:16px}
+  .qcols{grid-template-columns:1fr}
+  .rank{font-size:88px}
+}
+@media(max-width:560px){
+  .stat{flex:1 1 100%;border-right:0;border-bottom:2px solid var(--line)}
+  .stat:last-child{border-bottom:0}
+  .qtag{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Iconițe pixel (8x8), desenate manual -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 8 8">
+    <g fill="currentColor">
+      <rect x="1" y="0" width="2" height="1"/><rect x="5" y="0" width="2" height="1"/>
+      <rect x="0" y="1" width="8" height="2"/><rect x="1" y="3" width="6" height="1"/>
+      <rect x="2" y="4" width="4" height="1"/><rect x="3" y="5" width="2" height="2"/>
+    </g>
+  </symbol>
+  <symbol id="i-coin" viewBox="0 0 8 8">
+    <g fill="currentColor">
+      <rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="6" height="1"/>
+      <rect x="0" y="2" width="8" height="4"/><rect x="1" y="6" width="6" height="1"/>
+      <rect x="2" y="7" width="4" height="1"/>
+    </g>
+    <rect x="2" y="2" width="1" height="1" style="fill:var(--bg2)"/>
+  </symbol>
+  <symbol id="i-star" viewBox="0 0 8 8">
+    <g fill="currentColor">
+      <rect x="3" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="1"/>
+      <rect x="0" y="3" width="8" height="1"/><rect x="1" y="4" width="6" height="1"/>
+      <rect x="2" y="5" width="4" height="1"/>
+      <rect x="1" y="6" width="2" height="1"/><rect x="5" y="6" width="2" height="1"/>
+      <rect x="0" y="7" width="1" height="1"/><rect x="7" y="7" width="1" height="1"/>
+    </g>
+  </symbol>
+  <symbol id="i-alert" viewBox="0 0 8 8">
+    <g fill="currentColor">
+      <rect x="3" y="0" width="2" height="1"/><rect x="3" y="1" width="2" height="1"/>
+      <rect x="2" y="2" width="4" height="1"/><rect x="2" y="3" width="4" height="1"/>
+      <rect x="1" y="4" width="6" height="1"/><rect x="1" y="5" width="6" height="1"/>
+      <rect x="0" y="6" width="8" height="1"/><rect x="0" y="7" width="8" height="1"/>
+    </g>
+    <g style="fill:var(--bg2)">
+      <rect x="3" y="2" width="2" height="3"/><rect x="3" y="6" width="2" height="1"/>
+    </g>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 8 8">
+    <g fill="currentColor">
+      <rect x="0" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/>
+      <rect x="2" y="5" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/>
+      <rect x="4" y="3" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/>
+      <rect x="6" y="1" width="1" height="1"/><rect x="7" y="0" width="1" height="1"/>
+      <rect x="0" y="4" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/>
+      <rect x="2" y="6" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/>
+      <rect x="4" y="4" width="1" height="1"/><rect x="5" y="3" width="1" height="1"/>
+      <rect x="6" y="2" width="1" height="1"/><rect x="7" y="1" width="1" height="1"/>
+    </g>
+  </symbol>
+  <symbol id="i-chev" viewBox="0 0 8 8">
+    <g fill="currentColor">
+      <rect x="2" y="1" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/>
+      <rect x="4" y="3" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/>
+      <rect x="4" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/>
+      <rect x="2" y="7" width="1" height="1"/>
+    </g>
+  </symbol>
+</svg>
+
+<!-- ================= HUD lateral ================= -->
+<aside id="side">
+  <div class="logo">
+    <b><i></i>CONSPECT.EXE</b>
+    <small>designul jocurilor în R. Moldova — caiet interactiv</small>
+  </div>
+
+  <div class="pcard panel">
+    <p class="pc-name px">CONSPECTOR</p>
+    <p class="pc-class">clasa: elev-cercetător</p>
+    <div class="pc-lvl"><span class="vt" id="lvlNum">00</span><span class="pc-lab">LVL</span></div>
+  </div>
+
+  <div class="xpblock">
+    <div class="xp-top"><span class="px">XP — NOTIȚE</span><span class="vt" id="xpPct">0%</span></div>
+    <div id="segs"></div>
+    <p class="vt" id="xpTxt">XP 0/14</p>
+  </div>
+
+  <div>
+    <p class="map-t">HARTA NIVELELOR</p>
+    <nav id="mapNav">
+      <button class="cur" data-go="lv0">00 · START<svg class="ic"><use href="#i-check"/></svg></button>
+      <button data-go="lv1">01 · TERENUL<svg class="ic"><use href="#i-check"/></svg></button>
+      <button data-go="lv2">02 · SKILL TREE<svg class="ic"><use href="#i-check"/></svg></button>
+      <button data-go="lv3">03 · INFLUENȚA<svg class="ic"><use href="#i-check"/></svg></button>
+      <button data-go="lv4">04 · QUESTS<svg class="ic"><use href="#i-check"/></svg></button>
+      <button data-go="lv5">05 · BOSS FIGHT<svg class="ic"><use href="#i-check"/></svg></button>
+    </nav>
+  </div>
+
+  <div class="hud-btns">
+    <button class="sndBtn">SUNET: ON</button>
+    <button class="crtBtn">CRT: OFF</button>
+  </div>
+  <p class="hud-note">Totul rulează local în browser — nimic nu se trimite nicăieri.</p>
+</aside>
+
+<!-- ================= topbar mobil ================= -->
+<header id="topbar">
+  <span class="tb-logo px">CONSPECT<span class="hl">.EXE</span></span>
+  <div class="mini"><i id="miniFill"></i></div>
+  <span class="vt" id="lvlTxt" style="font-size:20px;color:var(--acid)">LVL 00</span>
+  <button class="tb-btn sndBtn">SUNET: ON</button>
+  <button class="tb-btn crtBtn">CRT: OFF</button>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="top">
+    <div class="hgrid">
+      <div>
+        <p class="kick rv"><span class="led blink"></span> CONSPECT Nº1 · CULTURĂ INFORMAȚIONALĂ · EDUCAȚIE MEDIA</p>
+        <h1 class="rv">DESIGNUL <span class="hl">JOCURILOR</span> ÎN REPUBLICA MOLDOVA</h1>
+        <p class="lede rv">Cum arată domeniul jocurilor la noi, cine îl construiește astăzi și ce lasă el în generațiile care cresc cu un controller în mână — rezumat ca într-un joc: nivele, notițe de colectat și un boss final.</p>
+        <div class="dialog rv">
+          <span class="who">NPC — PROFESORUL DE CONSPECT</span>
+          <p>„În Moldova jocurile video sunt, deocamdată, mai degrabă un <mark>consum</mark> decât o <mark>producție</mark>. Dar fiecare consumator de 12 ani e un potențial creator. Conspectul ăsta întreabă: ce îl desparte de partea cealaltă a ecranului?”</p>
+        </div>
+        <div class="hbtns rv">
+          <button class="btn" id="startBtn"><svg class="ic"><use href="#i-chev"/></svg> APĂSĂ START</button>
+          <span class="hint">scrolează · colectează 14 notițe · treci boss-ul</span>
+        </div>
+      </div>
+      <div class="rv">
+        <div class="skywrap">
+          <canvas id="sky"></canvas>
+          <div class="skybar"><span><span class="led blink"></span>CHIȘINĂU · 47°01′N 28°49′E</span><span>EST. 1436</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NIVEL 00 ================= -->
+  <section class="level" id="lv0" data-level="0">
+    <header class="lhead rv">
+      <span class="lnum">00</span>
+      <div>
+        <p class="l-kick">NIVEL 00 · TIPARE DE START</p>
+        <h2>DEFINIȚIILE CARE FAC DIFERENȚA</h2>
+        <div class="keys"><span>game design</span><span>cultură informațională</span><span>medium interactiv</span></div>
+      </div>
+    </header>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-01</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Game design — nu e „grafica jocului”</h3>
+        <p>Game design înseamnă proiectarea regulilor, mecanicilor, narativului și a sistemelor de recompensă care fac o experiență interactivă captivantă. Nu e „desenul jocului”, ci <mark>arhitectura deciziilor</mark> pe care jucătorul le poate face — și a consecințelor lor.</p>
+      </div>
+    </article>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-02</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Cultura informațională — scutul jucătorului</h3>
+        <p>E capacitatea de a găsi, evalua și folosi critic informația. Aplicată jocurilor: să înțelegi <mark>cum te construiește un joc</mark> — ce te motivează, ce te monetizează, ce te învață fără să-ți ceară acordul.</p>
+      </div>
+    </article>
+
+    <div class="dialog rv" style="margin-top:24px">
+      <span class="who">NPC — PROFESORUL DE CONSPECT</span>
+      <p>„De ce le punem pe amândouă în același caiet? Pentru că un joc e un medium informațional: transmite valori, modele și date. Cine nu știe să-l citească... <mark>e citit de el</mark>.”</p>
+    </div>
+  </section>
+
+  <!-- ================= NIVEL 01 ================= -->
+  <section class="level" id="lv1" data-level="1">
+    <header class="lhead rv">
+      <span class="lnum">01</span>
+      <div>
+        <p class="l-kick">NIVEL 01 · TERENUL</p>
+        <h2>CUM SE MANIFESTĂ DOMENIUL LA NOI</h2>
+        <div class="keys"><span>ecosistem</span><span>outsourcing</span><span>Moldova IT Park</span><span>gamejam</span></div>
+      </div>
+    </header>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-03</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Un ecosistem tânăr, dar nu gol</h3>
+        <p>Nu există încă un studio emblematic cu titluri proprii cunoscute internațional, dar există oameni reali în domeniu: programatori, artiști 2D/3D, testeri și sunetiști care lucrează pentru studiouri din afară. Domeniul se manifestă, în prezent, mai ales ca <mark>servicii</mark>, nu ca produse.</p>
+      </div>
+    </article>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-04</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Educația ca rampă de lansare</h3>
+        <p>UTM, centrul Tekwill și programele de tip „Tekwill în fiecare școală” duc programarea în licee. Game design ca disciplină dedicată apare doar fragmentar — la cursuri opționale, cluburi și hackatoane — de aceea viitorii designeri se formează, pentru moment, <mark>autodidact</mark>.</p>
+      </div>
+    </article>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-05</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Comunitatea ține domeniul viu</h3>
+        <p>Global Game Jam are nod la Chișinău, iar grupurile și întâlnirile locale de game dev adună la aceeași masă studenți, freelanceri și curioși. În 48 de ore de gamejam se naște mai multă încredere decât într-un semestru de „ar fi fost frumos”.</p>
+      </div>
+    </article>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-06</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Fiscalul ca avantaj competitiv</h3>
+        <p>Moldova IT Park (funcționează din 2018) oferă rezidenților un <mark>impozit unic de 7%</mark> din venitul din vânzări — un magnet pentru companiile de software. Jocurile sunt o nișă mică în acest ecosistem, dar cresc odată cu el.</p>
+      </div>
+    </article>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-07</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Consum local masiv, producție locală mică</h3>
+        <p>Jocurile mobile gratuite (Brawl Stars, Roblox, Minecraft), CS2, Valorant sau Dota domină timpul liber; cluburile de esports și cafenelele de gaming completează imaginea. Însumând: <mark>se joacă mult</mark>, se produce puțin — iar diferența dintre ele e oportunitatea.</p>
+      </div>
+    </article>
+
+    <div class="stats rv">
+      <div class="stat">
+        <span class="s-tag">ESTIMARE</span>
+        <div class="s-num"><span data-count="1500">0</span><i>+</i></div>
+        <div class="s-lab">companii rezidente în Moldova IT Park</div>
+      </div>
+      <div class="stat">
+        <span class="s-tag">ESTIMARE</span>
+        <div class="s-num"><span data-count="20000">0</span><i>+</i></div>
+        <div class="s-lab">angajați în sectorul TIC al R. Moldova</div>
+      </div>
+      <div class="stat">
+        <span class="s-tag">ESTIMARE</span>
+        <div class="s-num"><span data-count="90">0</span><i>%</i></div>
+        <div class="s-lab">din adolescenți se joacă jocuri video (tendință europeană)</div>
+      </div>
+      <div class="stat">
+        <span class="s-tag fact">FAPT</span>
+        <div class="s-num"><span data-count="48">0</span><i>h</i></div>
+        <div class="s-lab">durata unui gamejam — cât se naște un prototip</div>
+      </div>
+    </div>
+    <p class="fnote rv"><b>*</b> Cifrele marcate ESTIMARE sunt orientative și se schimbă de la an la an. Sarcina cultural-informațională: verifică-le în surse primare înainte de a le cita.</p>
+  </section>
+
+  <!-- ================= NIVEL 02 ================= -->
+  <section class="level" id="lv2" data-level="2">
+    <header class="lhead rv">
+      <span class="lnum">02</span>
+      <div>
+        <p class="l-kick">NIVEL 02 · SKILL TREE</p>
+        <h2>LANȚUL DE VALOARE AL UNUI JOC — ȘI CE DEȚINEM LOCAL</h2>
+        <div class="keys"><span>capabilități</span><span>gap</span><span>lanț de valoare</span></div>
+      </div>
+    </header>
+
+    <p class="lede2 rv">Ca într-un RPG, ecosistemul local are „skill-uri” fixate diferit. Verde = capabilitate reală, amber = medie, roz = gap. Atinge fiecare nod:</p>
+
+    <div class="tree rv" id="skillRow"></div>
+    <div class="sdetail rv">
+      <h4><span id="skName">—</span><span class="skst" id="skStatus">—</span></h4>
+      <p id="skText">—</p>
+    </div>
+
+    <article class="note rv" data-note style="margin-top:26px">
+      <div class="n-idx"><span class="idx">N-08</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Cum se citește skill tree-ul</h3>
+        <p>Coloana verde e reală: Moldova știe să construiască <mark>bucăți din jocuri</mark>. Dar designul (creierul) și publishing-ul (buzunarul) stau, de regulă, în străinătate — de acolo pleacă profitul și deciziile creative. Gap-ul ăsta e, de fapt, <mark>harta oportunităților</mark> pentru generația ta.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ================= NIVEL 03 ================= -->
+  <section class="level" id="lv3" data-level="3">
+    <header class="lhead rv">
+      <span class="lnum">03</span>
+      <div>
+        <p class="l-kick">NIVEL 03 · INFLUENȚA</p>
+        <h2>CE LASĂ JOCURILE ÎN GENERAȚIILE NOI</h2>
+        <div class="keys"><span>gamificare</span><span>loot box</span><span>media literacy</span><span>brain drain</span></div>
+      </div>
+    </header>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-09</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Un joc antrenează — în ambele sensuri</h3>
+        <p>Pentru mulți tineri, jocurile sunt mediul cu cel mai mult timp-ecran, după școală. Indiferent dacă notăm asta sau nu, ele antrenează reflexe: de decizie, de reacție la recompensă, de citire a sistemelor. Întrebarea corectă nu e „bun sau rău?”, ci <mark>ce anume exersează?</mark>.</p>
+      </div>
+    </article>
+
+    <div class="tabs rv">
+      <button class="tab on" data-tab="buffs"><svg class="ic"><use href="#i-star"/></svg> BUFF — EFECTE +</button>
+      <button class="tab" data-tab="debuffs"><svg class="ic"><use href="#i-alert"/></svg> DEBUFF — RISCURI −</button>
+    </div>
+
+    <div class="qlog" id="tab-buffs">
+      <div class="q"><svg class="ic"><use href="#i-star"/></svg><div>
+        <h4>Gândire computațională</h4><p>Jocurile antrenează decompunerea problemelor, iterația și acceptarea eșecului ca metodă de învățare: moare → încearcă altfel → reușește.</p></div>
+        <span class="qtag">+GÂNDIRE</span></div>
+      <div class="q"><svg class="ic"><use href="#i-star"/></svg><div>
+        <h4>Rampă spre cariere IT</h4><p>O parte semnificativă dintre programatorii locali au făcut primii pași prin servere private de Minecraft, modding sau scripturi pentru jocuri.</p></div>
+        <span class="qtag">+CARIERE</span></div>
+      <div class="q"><svg class="ic"><use href="#i-star"/></svg><div>
+        <h4>Limba engleză prin imersiune</h4><p>Vocabularul tehnic prins din jocuri e memorat în context: nu se „învăță”, se folosește. Imersiunea bătută în repetiție = fluency.</p></div>
+        <span class="qtag">+ENGLEZĂ</span></div>
+      <div class="q"><svg class="ic"><use href="#i-star"/></svg><div>
+        <h4>Creativitate de producător</h4><p>Roblox, Unity și Godot sunt accesibile de la 12 ani: primul „jocul meu” ajunge adesea primul portofoliu — cu ani înainte de facultate.</p></div>
+        <span class="qtag">+CREAȚIE</span></div>
+      <div class="q"><svg class="ic"><use href="#i-star"/></svg><div>
+        <h4>Joc în echipă</h4><p>Esports-ul școlar și gamejam-urile predau roluri, deadline-uri și comunicare — ca un sport, dar pe scaune.</p></div>
+        <span class="qtag">+ECHIPĂ</span></div>
+    </div>
+
+    <div class="qlog hidden" id="tab-debuffs">
+      <div class="q"><svg class="ic"><use href="#i-alert"/></svg><div>
+        <h4>Somn & mișcare</h4><p>Sesiunile lungi împing culcarea și deconectarea. Soluția e disciplină discutată, nu interdicție: limite la fel de clare ca programul școlii.</p></div>
+        <span class="qtag">−SOMN</span></div>
+      <div class="q"><svg class="ic"><use href="#i-alert"/></svg><div>
+        <h4>Monetizare agresivă</h4><p>Loot boxes, battle pass-uri și monede virtuale sunt proiectate pe impuls. Fără literație financiară, portofelul plătește lecția.</p></div>
+        <span class="qtag">−BANI</span></div>
+      <div class="q"><svg class="ic"><use href="#i-alert"/></svg><div>
+        <h4>Filtru de informație</h4><p>Voice chat, grupuri și „jurnalism” de gaming sunt canale rapide de zvonuri și manipulare. Cultura informațională e scutul.</p></div>
+        <span class="qtag">−FILTRU</span></div>
+      <div class="q"><svg class="ic"><use href="#i-alert"/></svg><div>
+        <h4>Toxicitate</h4><p>Competiția fără ghidare produce limbaj agresiv. Comunitatea locală — cluburi, profesori, organizatori — poate modela alt standard.</p></div>
+        <span class="qtag">−CLIMĂ</span></div>
+      <div class="q"><svg class="ic"><use href="#i-alert"/></svg><div>
+        <h4>Drain de talent</h4><p>Creatorii cei mai buni pleacă spre studiouri externe sau lucrează „împrumutat” pentru ele: țara formează, alții lansează.</p></div>
+        <span class="qtag">−TALENT</span></div>
+    </div>
+
+    <article class="note rv" data-note style="margin-top:26px">
+      <div class="n-idx"><span class="idx">N-10</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Antidotele există</h3>
+        <p>Limite discutate, nu impuse. Bugetul de timp tratat ca banii de buzunar. Jucat împreună, uneori. Și întrebarea-cheie, după fiecare sesiune: <mark>„cum te face jocul ăsta să te simți după?”</mark> — de acolo începe gândirea critică.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ================= NIVEL 04 ================= -->
+  <section class="level" id="lv4" data-level="4">
+    <header class="lhead rv">
+      <span class="lnum">04</span>
+      <div>
+        <p class="l-kick">NIVEL 04 · QUESTS</p>
+        <h2>PROVOCĂRI — PENTRU TINE ȘI PENTRU ECOSISTEM</h2>
+        <div class="keys"><span>prototip</span><span>itch.io</span><span>portofoliu</span><span>fonduri</span></div>
+      </div>
+    </header>
+
+    <div class="qcols rv">
+      <div class="qcol sq">
+        <h3>SIDE QUESTS — PENTRU TINE</h3>
+        <ol>
+          <li><div><h4>Un weekend, un joc</h4><p>Participă la un gamejam (Global Game Jam Chișinău sau unul studentesc): 48 de ore îți arată mai mult despre design decât un semestru de teorie.</p></div></li>
+          <li><div><h4>Prototipul de 5 minute</h4><p>Alege un motor gratuit (Godot e open-source), termină un joc minuscul și lasă-l să fie imperfect. Terminat &gt; perfect.</p></div></li>
+          <li><div><h4>Publică-l pe itch.io</h4><p>Platformă gratuită, feedback real. Primul „jocul meu e online” bate zece ani de planuri.</p></div></li>
+          <li><div><h4>Joacă ca un designer</h4><p>După fiecare sesiune, notează o decizie de design care te-a făcut să continui. Asta e cultură informațională aplicată.</p></div></li>
+        </ol>
+      </div>
+      <div class="qcol mq">
+        <h3>MAIN QUESTS — PENTRU ECOSISTEM</h3>
+        <ol>
+          <li><div><h4>Curriculum dedicat</h4><p>Game design ca disciplină reală la universități și colegii, nu doar opțional.</p></div></li>
+          <li><div><h4>Primul studio-publisher local</h4><p>Prototip → finanțare → lansare. Lanțul trebuie închis în țară cel puțin o dată, ca precedent.</p></div></li>
+          <li><div><h4>Fond pentru prototipuri</h4><p>Micro-granturi pentru echipe tineri: costurile unui prototip sunt mici, impactul e uriaș.</p></div></li>
+          <li><div><h4>Media literacy prin jocuri</h4><p>Predă critica loot box-urilor și a dezinformării cu un joc, nu cu o prelegere.</p></div></li>
+        </ol>
+      </div>
+    </div>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-11</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Regula prototipului mic</h3>
+        <p>Nu ai nevoie de studio ca să începi: un motor gratuit, un weekend și o idee de o propoziție. Primul joc terminat — chiar urât — valorează mai mult decât zece concepte pe hârtie, pentru că <mark>terminat se poate juca, plănuit nu</mark>.</p>
+      </div>
+    </article>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-12</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Media literacy prin jocuri, nu despre jocuri</h3>
+        <p>Cea mai eficientă lecție de cultură informațională nu e o prelegere despre „pericolele jocurilor”, ci una trăită din interior: fă un joc cu loot box-uri și observă cum se simte să le vinzi. <mark>Înțelegerea vine din construcție</mark>.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ================= NIVEL 05 ================= -->
+  <section class="level" id="lv5" data-level="5">
+    <header class="lhead rv">
+      <span class="lnum">05</span>
+      <div>
+        <p class="l-kick">NIVEL 05 · BOSS FIGHT</p>
+        <h2>ULTIMUL NIVEL: QUIZ-UL CONSPECTULUI</h2>
+        <div class="keys"><span>evaluare</span><span>rang</span><span>certificat</span></div>
+      </div>
+    </header>
+
+    <article class="note rv" data-note>
+      <div class="n-idx"><span class="idx">N-13</span><span class="nbox"><svg class="ic"><use href="#i-check"/></svg></span></div>
+      <div>
+        <h3>Cum se trece un boss: citind din nou</h3>
+        <p>Boss-ul ăsta nu se învinge cu reflexe, ci cu memorie: toate răspunsurile sunt ascunse în nivelele de mai sus. Dacă ratezi — conspectul rămâne deschis. <mark>Respawn la nivelul respectiv</mark>.</p>
+      </div>
+    </article>
+
+    <div class="panel qpanel rv" id="quizBox">
+      <div class="qintro" id="qIntro">
+        <p class="qprog"><span>BOSS: „INTERROGA-TORUL”</span><span>HP: 6 întrebări</span></p>
+        <p class="qtext">Îți cere evidența: ce ai reținut din teren, din skill tree și din influențe? Șase întrebări, un rang la final — și un certificat de conspect cu numele tău.</p>
+        <button class="btn" id="startQ"><svg class="ic"><use href="#i-chev"/></svg> ÎNCEPE BOSS FIGHTUL</button>
+      </div>
+
+      <div id="qMain" class="hidden">
+        <p class="qprog"><span id="qProg">ÎNTREBAREA 1/6</span><span>SCOR: <span id="qLive">0</span></span></p>
+        <p class="qtext" id="qText"></p>
+        <div class="ans" id="qAns"></div>
+        <p class="why" id="qWhy"></p>
+        <button class="btn qnext hidden" id="qNextBtn">ÎNTREBAREA URMĂTOARE</button>
+      </div>
+
+      <div id="qEnd" class="hidden">
+        <div class="rankline">
+          <span class="rank" id="qRank">S</span>
+          <div>
+            <p class="px" style="font-size:10px;color:var(--acid);letter-spacing:.1em">BOSS
